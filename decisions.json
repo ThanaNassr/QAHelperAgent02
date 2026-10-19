@@ -1,0 +1,68 @@
+[
+  {
+    "call_id": "CALL-001",
+    "call_date": "2026-10-20",
+    "decision": "reject",
+    "note": "eww"
+  },
+  {
+    "call_id": "CALL-002",
+    "call_date": "2026-10-20",
+    "decision": "approve",
+    "note": "wss"
+  },
+  {
+    "call_id": "CALL-003",
+    "call_date": "2026-10-20",
+    "decision": "reject",
+    "note": "NO"
+  },
+  {
+    "call_id": "CALL-005",
+    "call_date": "2026-10-20",
+    "decision": "reject",
+    "note": "era"
+  },
+  {
+    "call_id": "CALL-008",
+    "call_date": "2026-10-20",
+    "decision": "approve",
+    "note": "hello"
+  },
+  {
+    "call_id": "CALL-009",
+    "call_date": "2026-10-20",
+    "decision": "approve",
+    "note": "ddd"
+  },
+  {
+    "call_id": "CALL-012",
+    "call_date": "2026-10-20",
+    "decision": "approve",
+    "note": ""
+  },
+  {
+    "call_id": "CALL-014",
+    "call_date": "2026-10-20",
+    "decision": "approve",
+    "note": "ghtr"
+  },
+  {
+    "call_id": "CALL-017",
+    "call_date": "2026-10-20",
+    "decision": "approve",
+    "note": "h"
+  },
+  {
+    "call_id": "CALL-019",
+    "call_date": "2026-10-20",
+    "decision": "approve",
+    "note": "hello"
+  },
+  {
+    "call_id": "CALL-020",
+    "call_date": "2026-10-20",
+    "decision": "approve",
+    "note": ""
+  }
+]
