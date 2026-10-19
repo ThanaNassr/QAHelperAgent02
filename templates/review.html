@@ -80,6 +80,49 @@
         margin-bottom: 10px;
         line-height: 1.35;
       }
+      .severity-scale {
+        margin-top: 14px;
+        padding: 10px;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        background: #f8fafc;
+      }
+      .severity-scale ul {
+        margin: 8px 0 0;
+        padding-left: 18px;
+      }
+      .criteria-list {
+        margin-top: 12px;
+      }
+      .criteria-item {
+        margin-bottom: 10px;
+        padding: 10px;
+        border: 1px solid #e5e7eb;
+        border-radius: 6px;
+      }
+      .criteria-item label {
+        display: block;
+        margin-bottom: 6px;
+        font-weight: 600;
+      }
+      .criteria-item select {
+        width: 100%;
+      }
+      .severity-message {
+        padding: 8px;
+        border-radius: 6px;
+        margin-bottom: 10px;
+      }
+      .severity-message.warning {
+        background: #fff7e8;
+        border: 1px solid #f2d49b;
+        color: #7a4f00;
+      }
+      .severity-message.critical {
+        background: #ffe8e8;
+        border: 1px solid #f3b4b4;
+        color: #8a1e1e;
+      }
       .actions {
         display: flex;
         gap: 10px;
@@ -137,6 +180,15 @@
           <h2>Summary</h2>
           <div class="summary">{{ call.summary }}</div>
 
+          <div class="severity-scale">
+            <strong>Severity Scale (0 to 5)</strong>
+            <ul>
+              {% for level in range(0, 6) %}
+              <li><strong>{{ level }}:</strong> {{ severity_labels[level] }}</li>
+              {% endfor %}
+            </ul>
+          </div>
+
           <div class="decision-box">
             <h3>Review Decision</h3>
             {% if previous_decision %}
@@ -147,15 +199,52 @@
               {{ previous_decision.note if previous_decision.note else '(No note)' }}
             </div>
             {% endif %}
+            <div
+              id="severity-live-message"
+              class="severity-message {% if severity_message_type %}{{ severity_message_type }}{% endif %}"
+              {% if not severity_message %}style="display: none"{% endif %}
+            >
+              {{ severity_message if severity_message else '' }}
+            </div>
             {% if error %}
             <div class="error">{{ error }}</div>
             {% endif %}
-            <form method="POST" action="{{ url_for('submit_decision') }}">
+            <form id="decision-form" method="POST" action="{{ url_for('submit_decision') }}">
               <input type="hidden" name="index" value="{{ index }}" />
+
+              <div class="criteria-list">
+                {% if criteria_items %}
+                  {% for criterion in criteria_items %}
+                  {% set criterion_idx = loop.index0 %}
+                  <div class="criteria-item">
+                    <label for="severity_{{ criterion_idx }}">{{ criterion }}</label>
+                    <select
+                      id="severity_{{ criterion_idx }}"
+                      name="severity_{{ criterion_idx }}"
+                      data-severity-select
+                    >
+                      {% for level in range(0, 6) %}
+                      <option
+                        value="{{ level }}"
+                        {% if form_severity_values and form_severity_values.get(criterion_idx|string) == level %}selected{% endif %}
+                      >
+                        {{ level }} - {{ severity_labels[level] }}
+                      </option>
+                      {% endfor %}
+                    </select>
+                  </div>
+                  {% endfor %}
+                {% else %}
+                <div class="criteria-item">
+                  No criteria items found in <code>criteria.md</code>.
+                </div>
+                {% endif %}
+              </div>
 
               <div class="row">
                 <label>
                   <input
+                    id="decision-approve"
                     type="radio"
                     name="decision"
                     value="approve"
@@ -165,6 +254,7 @@
                 </label>
                 <label style="margin-left: 14px">
                   <input
+                    id="decision-reject"
                     type="radio"
                     name="decision"
                     value="reject"
@@ -198,5 +288,51 @@
         </div>
       </div>
     </div>
+    <script>
+      (function () {
+        const severitySelects = Array.from(document.querySelectorAll("[data-severity-select]"));
+        const approveOption = document.getElementById("decision-approve");
+        const severityMessage = document.getElementById("severity-live-message");
+
+        function evaluateSeverity() {
+          const selectedValues = severitySelects.map((select) => Number(select.value));
+          const hasSeverity5 = selectedValues.includes(5);
+          const hasSeverity4 = selectedValues.includes(4);
+
+          if (!approveOption || !severityMessage) return;
+
+          if (hasSeverity5) {
+            approveOption.disabled = true;
+            if (approveOption.checked) {
+              approveOption.checked = false;
+            }
+            severityMessage.className = "severity-message critical";
+            severityMessage.style.display = "block";
+            severityMessage.textContent =
+              "At least one criteria item is severity 5. Approve is blocked and this requires review.";
+            return;
+          }
+
+          approveOption.disabled = false;
+
+          if (hasSeverity4) {
+            severityMessage.className = "severity-message warning";
+            severityMessage.style.display = "block";
+            severityMessage.textContent =
+              "At least one criteria item is severity 4. Please review carefully.";
+            return;
+          }
+
+          severityMessage.className = "severity-message";
+          severityMessage.style.display = "none";
+          severityMessage.textContent = "";
+        }
+
+        severitySelects.forEach((select) => {
+          select.addEventListener("change", evaluateSeverity);
+        });
+        evaluateSeverity();
+      })();
+    </script>
   </body>
 </html>
