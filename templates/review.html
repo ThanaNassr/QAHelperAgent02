@@ -1,0 +1,185 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Call Summary Review</title>
+    <style>
+      body {
+        margin: 0;
+        font-family: Arial, sans-serif;
+        background: #f7f7f9;
+        color: #222;
+      }
+      .container {
+        max-width: 1200px;
+        margin: 20px auto;
+        padding: 0 16px;
+      }
+      .header {
+        margin-bottom: 14px;
+      }
+      .meta {
+        color: #555;
+        font-size: 14px;
+      }
+      .layout {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 16px;
+      }
+      .panel {
+        background: #fff;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        padding: 14px;
+      }
+      h2 {
+        margin-top: 0;
+        font-size: 18px;
+      }
+      ol {
+        padding-left: 20px;
+        margin: 0;
+      }
+      li {
+        margin-bottom: 8px;
+        line-height: 1.35;
+      }
+      .summary {
+        white-space: pre-wrap;
+        line-height: 1.4;
+      }
+      .decision-box {
+        margin-top: 14px;
+        border-top: 1px solid #eee;
+        padding-top: 14px;
+      }
+      .row {
+        margin-bottom: 10px;
+      }
+      textarea {
+        width: 100%;
+        min-height: 90px;
+        resize: vertical;
+      }
+      .error {
+        background: #ffe8e8;
+        border: 1px solid #f3b4b4;
+        color: #8a1e1e;
+        padding: 8px;
+        border-radius: 6px;
+        margin-bottom: 10px;
+      }
+      .actions {
+        display: flex;
+        gap: 10px;
+        margin-top: 14px;
+      }
+      button,
+      .link-btn {
+        background: #2f6feb;
+        color: #fff;
+        border: none;
+        border-radius: 6px;
+        padding: 8px 12px;
+        cursor: pointer;
+        text-decoration: none;
+        font-size: 14px;
+      }
+      .link-btn.secondary,
+      button.secondary {
+        background: #6b7280;
+      }
+      .pagination {
+        display: flex;
+        justify-content: space-between;
+        margin-top: 16px;
+      }
+      @media (max-width: 900px) {
+        .layout {
+          grid-template-columns: 1fr;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="header">
+        <h1>Call Summary Review Tool</h1>
+        <div class="meta">
+          <strong>{{ call.id }}</strong> | Date: {{ call.call_date }} |
+          Estimated Duration: {{ call.estimated_duration }} | Call {{ index + 1 }}
+          of {{ total }}
+        </div>
+      </div>
+
+      <div class="layout">
+        <div class="panel">
+          <h2>Transcript</h2>
+          <ol>
+            {% for turn in turns %}
+            <li>{{ turn }}</li>
+            {% endfor %}
+          </ol>
+        </div>
+
+        <div class="panel">
+          <h2>Summary</h2>
+          <div class="summary">{{ call.summary }}</div>
+
+          <div class="decision-box">
+            <h3>Review Decision</h3>
+            {% if error %}
+            <div class="error">{{ error }}</div>
+            {% endif %}
+            <form method="POST" action="{{ url_for('submit_decision') }}">
+              <input type="hidden" name="index" value="{{ index }}" />
+
+              <div class="row">
+                <label>
+                  <input
+                    type="radio"
+                    name="decision"
+                    value="approve"
+                    {% if saved_decision and saved_decision.decision == 'approve' %}checked{% endif %}
+                  />
+                  Approve
+                </label>
+                <label style="margin-left: 14px">
+                  <input
+                    type="radio"
+                    name="decision"
+                    value="reject"
+                    {% if saved_decision and saved_decision.decision == 'reject' %}checked{% endif %}
+                  />
+                  Reject
+                </label>
+              </div>
+
+              <div class="row">
+                <label for="note">Note (required for reject)</label>
+                <textarea id="note" name="note">{{ saved_decision.note if saved_decision else '' }}</textarea>
+              </div>
+
+              <button type="submit">Save Decision</button>
+            </form>
+          </div>
+        </div>
+      </div>
+
+      <div class="pagination">
+        <div>
+          {% if index > 0 %}
+          <a class="link-btn secondary" href="{{ url_for('review_call', index=index-1) }}">Previous</a>
+          {% endif %}
+        </div>
+        <div>
+          {% if index < total - 1 %}
+          <a class="link-btn" href="{{ url_for('review_call', index=index+1) }}">Next</a>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </body>
+</html>
