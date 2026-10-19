@@ -71,6 +71,15 @@
         border-radius: 6px;
         margin-bottom: 10px;
       }
+      .previous-note {
+        background: #eef4ff;
+        border: 1px solid #c8d8ff;
+        color: #223e74;
+        padding: 10px;
+        border-radius: 6px;
+        margin-bottom: 10px;
+        line-height: 1.35;
+      }
       .actions {
         display: flex;
         gap: 10px;
@@ -130,6 +139,14 @@
 
           <div class="decision-box">
             <h3>Review Decision</h3>
+            {% if previous_decision %}
+            <div class="previous-note">
+              <strong>Previous saved decision:</strong>
+              {{ previous_decision.decision|capitalize }}<br />
+              <strong>Previous note:</strong>
+              {{ previous_decision.note if previous_decision.note else '(No note)' }}
+            </div>
+            {% endif %}
             {% if error %}
             <div class="error">{{ error }}</div>
             {% endif %}
@@ -142,7 +159,7 @@
                     type="radio"
                     name="decision"
                     value="approve"
-                    {% if saved_decision and saved_decision.decision == 'approve' %}checked{% endif %}
+                    {% if form_state and form_state.decision == 'approve' %}checked{% endif %}
                   />
                   Approve
                 </label>
@@ -151,7 +168,7 @@
                     type="radio"
                     name="decision"
                     value="reject"
-                    {% if saved_decision and saved_decision.decision == 'reject' %}checked{% endif %}
+                    {% if form_state and form_state.decision == 'reject' %}checked{% endif %}
                   />
                   Reject
                 </label>
@@ -159,7 +176,7 @@
 
               <div class="row">
                 <label for="note">Note (required for reject)</label>
-                <textarea id="note" name="note">{{ saved_decision.note if saved_decision else '' }}</textarea>
+                <textarea id="note" name="note">{{ form_state.note if form_state else '' }}</textarea>
               </div>
 
               <button type="submit">Save Decision</button>

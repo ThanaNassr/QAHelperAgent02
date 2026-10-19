@@ -89,7 +89,7 @@ def review_call():
     index = safe_index(request.args.get("index"), len(calls))
     call = calls[index]
     decisions = load_decisions()
-    saved_decision = decisions.get(call["id"])
+    previous_decision = decisions.get(call["id"])
 
     return render_template(
         "review.html",
@@ -97,7 +97,8 @@ def review_call():
         turns=split_transcript(call.get("transcript", "")),
         index=index,
         total=len(calls),
-        saved_decision=saved_decision,
+        previous_decision=previous_decision,
+        form_state={"decision": "", "note": ""},
         error=None,
     )
 
@@ -110,6 +111,7 @@ def submit_decision():
 
     index = safe_index(request.form.get("index"), len(calls))
     call = calls[index]
+    previous_decision = load_decisions().get(call["id"])
 
     decision = (request.form.get("decision") or "").strip().lower()
     note = (request.form.get("note") or "").strip()
@@ -121,7 +123,8 @@ def submit_decision():
             turns=split_transcript(call.get("transcript", "")),
             index=index,
             total=len(calls),
-            saved_decision={"decision": decision, "note": note},
+            previous_decision=previous_decision,
+            form_state={"decision": decision, "note": note},
             error="Please choose approve or reject.",
         )
 
@@ -132,7 +135,8 @@ def submit_decision():
             turns=split_transcript(call.get("transcript", "")),
             index=index,
             total=len(calls),
-            saved_decision={"decision": decision, "note": note},
+            previous_decision=previous_decision,
+            form_state={"decision": decision, "note": note},
             error="A note is required when rejecting a summary.",
         )
 
