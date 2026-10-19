@@ -24,6 +24,34 @@
     "note": "era"
   },
   {
+    "call_id": "CALL-007",
+    "call_date": "2026-10-20",
+    "decision": "approve",
+    "note": "hello",
+    "criteria": [
+      {
+        "item": "Accuracy",
+        "severity": 3
+      },
+      {
+        "item": "Unsupported Claims",
+        "severity": 0
+      },
+      {
+        "item": "Missing information",
+        "severity": 3
+      },
+      {
+        "item": "Call Outcomes and next steps",
+        "severity": 0
+      },
+      {
+        "item": "Attribution",
+        "severity": 0
+      }
+    ]
+  },
+  {
     "call_id": "CALL-008",
     "call_date": "2026-10-20",
     "decision": "approve",
@@ -56,8 +84,30 @@
   {
     "call_id": "CALL-019",
     "call_date": "2026-10-20",
-    "decision": "approve",
-    "note": "hello"
+    "decision": "reject",
+    "note": "approve is blocked",
+    "criteria": [
+      {
+        "item": "Accuracy",
+        "severity": 0
+      },
+      {
+        "item": "Unsupported Claims",
+        "severity": 0
+      },
+      {
+        "item": "Missing information",
+        "severity": 5
+      },
+      {
+        "item": "Call Outcomes and next steps",
+        "severity": 0
+      },
+      {
+        "item": "Attribution",
+        "severity": 0
+      }
+    ]
   },
   {
     "call_id": "CALL-020",
